@@ -11,7 +11,13 @@ const parseExpression = (value, isReactNode) => {
   return value
 }
 
-// eg: hello_world => HelloWorld
+/**
+ * 将下划线命名转化为大驼峰命名方式
+ * eg: hello_world => HelloWorld
+ * 
+ * @param {*} str
+ * @return {*} 
+ */
 const line2Hump = str => {
   str = str.replace(/[_|-](\w)/g, (all, letter) => {
     return letter.toUpperCase();
@@ -27,6 +33,12 @@ const isEmptyObj = o => {
   return false;
 };
 
+/**
+ * 将 componentsMap 的 list 转换为 object 的方式输出，key 为 comp.name
+ *
+ * @param {*} [compsMap={}]
+ * @return {*} 
+ */
 const transComponentsMap = (compsMap = {}) => {
   if (!compsMap || !Array.isArray(compsMap.list)) {
     return [];
@@ -34,8 +46,10 @@ const transComponentsMap = (compsMap = {}) => {
   const list = compsMap.list;
   return list.reduce((obj, comp) => {
     const componentName = comp.name;
+
     if (!obj[componentName]) {
       try {
+        // 组件对应的 package 版本处理
         let dependence = JSON.parse(comp.dependence);
         if (dependence) {
           comp.packageName = dependence.package;

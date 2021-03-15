@@ -18,6 +18,8 @@ const vm = new NodeVM({
 co(function*() {
   const xtplRender = thunkify(xtpl.render);
   const code = fs.readFileSync(path.resolve(__dirname, '../src/index.js'), 'utf8');
+
+  // 在 vm 中运行 render 函数
   const renderInfo = vm.run(code)(data, {
     prettier: prettier,
     _: _,
@@ -30,10 +32,12 @@ co(function*() {
   });
 
   if (renderInfo.noTemplate) {
+    // 处理自定义模板
     renderInfo.panelDisplay.forEach(file => {
       fs.writeFileSync(path.join(__dirname, `../code/${file.panelName}`), file.panelValue);
     });
   } else {
+    // 处理默认模板
     const renderData = renderInfo.renderData;
     const ret = yield xtplRender(path.resolve(__dirname, '../src/template.xtpl'), renderData, {});
 
