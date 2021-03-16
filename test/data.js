@@ -635,5 +635,5 @@ module.exports = {
       "key": "create"
     }],
     "selectedTab": "select"
-  }
+  },
 }

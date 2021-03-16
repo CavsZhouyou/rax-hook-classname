@@ -51,11 +51,12 @@ module.exports = function(schema, option) {
     }
   }
 
-  // invoke
+  // schema 做预处理，格式化所有 block 的 filename
   schemaHandler({
     json: schema,
     scale
   });
+
 
   // export module code
   let panelDisplay = [];

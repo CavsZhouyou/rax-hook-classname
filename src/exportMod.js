@@ -51,6 +51,12 @@ function exportMod(schema, option) {
   // init
   const init = [];
 
+  
+  /**
+   * 导入对应组件的依赖
+   *
+   * @param {*} componentName
+   */
   const collectImports = componentName => {
     let componentMap = componentsMap[componentName] || {};
     let packageName = componentMap.package || componentMap.packageName || componentName;
@@ -96,8 +102,10 @@ function exportMod(schema, option) {
 
     Object.keys(schema.props).forEach(key => {
       if (['className', 'style', 'text', 'src', 'key', 'codeStyle'].indexOf(key) === -1) {
+        // 添加自定义属性
         props += ` ${key}={${parseProps(schema.props[key])}}`;
       }
+
       if (key === 'codeStyle') {
         if(JSON.stringify(schema.props[key]) !== '{}') {
           props += ` style={${parseProps(schema.props[key])}}`;
@@ -207,15 +215,19 @@ function exportMod(schema, option) {
     } else {
       const type = schema.componentName.toLowerCase();
 
+      // 如果是 page 容器组件
+      // TODO: blockName === fileName 的判断没有看明白，通过 entry 的处理，应该都会走到这里来
       if (['page'].indexOf(type) !== -1 || blockName === fileName) {
         // 容器组件处理: state/method/dataSource/lifeCycle
         const states = [];
 
+        // state 数据处理
         if (schema.state) {
           states.push(`state = ${toString(schema.state)}`);
           statesData = toString(schema.state);
         }
 
+        // 自定义方法处理
         if (schema.methods) {
           Object.keys(schema.methods).forEach(name => {
             const { params, content } = parseFunction(schema.methods[name]);
@@ -223,6 +235,7 @@ function exportMod(schema, option) {
           });
         }
 
+        // 异步数据处理
         if (schema.dataSource && Array.isArray(schema.dataSource.list)) {
           schema.dataSource.list.forEach(item => {
             if (typeof item.isInit === 'boolean' && item.isInit) {
@@ -244,16 +257,22 @@ function exportMod(schema, option) {
           }
         }
 
+        // 生命周期处理
         if (schema.lifeCycles) {
           lifeCycles = parseLifeCycles(schema, init);
         }
 
+        // state 转换为 hooks
         if (statesData) {
           useState.push(parseState(statesData));
         }
       } else if (['block'].indexOf(type) !== -1) {
+        // 模块导入处理
+
         let props = '';
         Object.keys(schema.props).forEach(key => {
+
+          // 处理自定义 props;
           if (['className', 'style', 'text', 'src', 'key'].indexOf(key) === -1) {
             props += ` ${key}={${parseProps(schema.props[key])}}`;
           }
@@ -272,7 +291,7 @@ function exportMod(schema, option) {
     return result;
   };
 
-  // option.utils
+  // 初始化全局公共函数
   if (option.utils) {
     Object.keys(option.utils).forEach(name => {
       utils.push(`const ${name} = ${option.utils[name]}`);

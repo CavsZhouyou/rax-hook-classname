@@ -1,7 +1,29 @@
+/*
+ * @Author: xiaotian@tangping 
+ * @Descriptions: 
+ * @TodoList: 无
+ * @Date: 2021-03-16 11:02:30 
+ * @Last Modified by: xiaotian@tangping
+ * @Last Modified time: 2021-03-16 11:51:49
+ */
+
+/**
+ * 判断值是否为表达式
+ *
+ * @param {*} value
+ * @return {*} 
+ */
 const isExpression = value => {
   return /^\{\{.*\}\}$/.test(value);
 };
 
+/**
+ * 解析表达式
+ *
+ * @param {*} value
+ * @param {*} isReactNode
+ * @return {*} 
+ */
 const parseExpression = (value, isReactNode) => {
   if (isReactNode) {
     value = value.slice(1, -1).replace(/this\./gim, '');
@@ -67,6 +89,12 @@ const transComponentsMap = (compsMap = {}) => {
   }, {});
 };
 
+/**
+ * 将值转换为字符串格式，保证 function 值也能够正常转换
+ *
+ * @param {*} value
+ * @return {*} 
+ */
 const toString = value => {
   if ({}.toString.call(value) === '[object Function]') {
     return value.toString();
@@ -87,6 +115,12 @@ const toString = value => {
   return String(value);
 };
 
+/**
+ * 首字母大写
+ *
+ * @param {*} value
+ * @return {*} 
+ */
 const toUpperCaseStart = value => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
@@ -106,7 +140,14 @@ const deepClone = obj => {
   return objClone;
 };
 
-// convert to responsive unit, such as vw
+/**
+ * style 自适应和单位转换
+ *
+ * @param {*} style
+ * @param {*} scale
+ * @param {*} unit
+ * @return {*} 
+ */
 const parseStyle = (style, scale, unit) => {
   for (let key in style) {
     switch (key) {
@@ -143,7 +184,12 @@ const parseStyle = (style, scale, unit) => {
   return style;
 };
 
-// parse function, return params and content
+/**
+ * 解析 function，返回 params 和 content
+ *
+ * @param {*} func
+ * @return {*} 
+ */
 const parseFunction = func => {
   const funcString = func.toString();
   const params = funcString.match(/\([^\(\)]*\)/)[0].slice(1, -1);
@@ -158,6 +204,13 @@ const parseFunction = func => {
 };
 
 // parse layer props(static values or expression)
+/**
+ * 解析 value，使其以字符串解析的格式输出
+ *
+ * @param {*} value
+ * @param {*} isReactNode
+ * @return {*} 
+ */
 const parseProps = (value, isReactNode) => {
   if (typeof value === 'string') {
     if (isExpression(value)) {
@@ -262,7 +315,12 @@ const parseLoop = (loop, loopArg, render, states, schema) => {
   };
 };
 
-// parse state
+/**
+ * state 转换为 hooks
+ *
+ * @param {*} states
+ * @return {*} 
+ */
 const parseState = states => {
   let stateName = 'state';
   // hooks state
@@ -344,7 +402,13 @@ const existImport = (imports, singleImport) => {
   return exist;
 };
 
-// parse async dataSource
+/**
+ * 处理异步数据请求
+ *
+ * @param {*} data
+ * @param {*} imports
+ * @return {*} 
+ */
 const parseDataSource = (data, imports) => {
   const name = data.id;
   const { uri, method, params } = data.options;
